@@ -383,7 +383,7 @@ ${answerLabels.join("\n")}
 
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <button className="primary-btn" onClick={askAI}>
-                AIにもっと深く聞いてみる
+                ワンポイントアドバイスをもらう
               </button>
               <button className="ghost-btn" onClick={reset}>
                 もう一度やり直す

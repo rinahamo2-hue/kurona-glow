@@ -164,12 +164,10 @@ const patternData = {
 };
 
 export default function App() {
-  const [phase, setPhase] = useState("intro"); // intro | quiz | result | ai
+  const [phase, setPhase] = useState("intro");
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [result, setResult] = useState(null);
-  const [aiResponse, setAiResponse] = useState("");
-  const [aiLoading, setAiLoading] = useState(false);
   const [selected, setSelected] = useState(null);
 
   const handleAnswer = (value) => {
@@ -181,7 +179,6 @@ export default function App() {
       if (current + 1 < questions.length) {
         setCurrent(current + 1);
       } else {
-        // tally
         const counts = {};
         newAnswers.forEach((v) => {
           const p = patternMap[v] || "バランス型";
@@ -194,49 +191,11 @@ export default function App() {
     }, 350);
   };
 
-  const askAI = async () => {
-    setPhase("ai");
-    setAiLoading(true);
-    const answerLabels = answers.map((v, i) => {
-      const q = questions[i];
-      const opt = q.options.find((o) => o.value === v);
-      return `Q${i + 1}: ${q.text}\n→ ${opt?.label}`;
-    });
-
-    const prompt = `あなたは無意識のパターンと思い込みの専門家です。
-以下のユーザーの回答を分析して、その人の無意識のパターンについて、温かくも鋭い洞察を日本語で200字程度で伝えてください。
-診断タイプは「${result.title}」です。
-
-回答：
-${answerLabels.join("\n")}
-
-注意：説教的にならず、共感と気づきを重視した語り口で。`;
-
-    try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
-          messages: [{ role: "user", content: prompt }],
-        }),
-      });
-      const data = await res.json();
-      const text = data.content?.map((c) => c.text || "").join("") || "応答を取得できませんでした。";
-      setAiResponse(text);
-    } catch {
-      setAiResponse("AIの応答を取得できませんでした。");
-    }
-    setAiLoading(false);
-  };
-
   const reset = () => {
     setPhase("intro");
     setCurrent(0);
     setAnswers([]);
     setResult(null);
-    setAiResponse("");
     setSelected(null);
   };
 
